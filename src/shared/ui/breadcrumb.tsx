@@ -50,7 +50,7 @@ export const Breadcrumb = ({ items, onItemClick, isMobile = false, isLoading = f
   };
 
   return (
-    <nav aria-label="breadcrumb" className="py-2 px-4 bg-gray-100 rounded">
+    <nav aria-label="breadcrumb" className="py-2 px-4 bg-blue-50 bg-opacity-80 rounded-md shadow-sm">
       <ol className="flex items-center flex-wrap">
         {optimizedItems.map((item, index) => {
           const isLast = index === optimizedItems.length - 1;
@@ -59,9 +59,13 @@ export const Breadcrumb = ({ items, onItemClick, isMobile = false, isLoading = f
             <Fragment key={item.path || index}>
               <li className={`${isLast ? "font-semibold" : ""}`}>
                 {item.isActive ? (
-                  <span className="text-gray-700">{item.label}</span>
+                  <span className="text-indigo-800">{item.label}</span>
                 ) : item.path ? (
-                  <Link to={item.path} className="text-blue-600 hover:underline" onClick={() => handleClick(item)}>
+                  <Link 
+                    to={item.path} 
+                    className="text-blue-600 hover:text-indigo-700 hover:underline transition-colors duration-200" 
+                    onClick={() => handleClick(item)}
+                  >
                     {item.label}
                   </Link>
                 ) : (
@@ -69,8 +73,10 @@ export const Breadcrumb = ({ items, onItemClick, isMobile = false, isLoading = f
                 )}
               </li>
               {!isLast && (
-                <li className="mx-2 text-gray-500">
-                  <span>/</span>
+                <li className="mx-2 text-blue-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </li>
               )}
             </Fragment>
