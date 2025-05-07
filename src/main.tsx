@@ -8,7 +8,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 const queryClient = new QueryClient();
 createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
+    <BrowserRouter basename={`${import.meta.env.VITE_PUBLIC_URL}`}>
       <App />
     </BrowserRouter>
     <ReactQueryDevtools initialIsOpen={false} />
