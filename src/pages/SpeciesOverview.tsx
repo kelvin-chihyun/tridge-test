@@ -1,25 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { Layout } from "../shared/ui";
-
-// 포켓몬 종류 상세 정보를 가져오는 함수
-const fetchSpeciesDetail = async (speciesId: string) => {
-  if (!speciesId) return null;
-  const response = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${speciesId}`);
-  if (!response.ok) throw new Error("Failed to fetch species detail");
-  return response.json();
-};
+import { api, createQueryOptions } from "../shared/lib/tanstack";
+import { SpeciesData } from "../shared/types";
+import { getColorGradient } from "../shared/util";
 
 export const SpeciesOverview = () => {
   // URL 파라미터에서 species ID 가져오기
   const { species } = useParams<{ species: string }>();
 
   // 포켓몬 종류 데이터 가져오기
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["species", species],
-    queryFn: () => fetchSpeciesDetail(species || ""),
-    enabled: !!species,
-  });
+  const { data, isLoading, error } = useQuery<SpeciesData, Error>(createQueryOptions(["species", species], () => api.fetchSpeciesDetail(species || ""), { enabled: !!species }));
 
   if (isLoading) {
     return (
@@ -51,25 +42,7 @@ export const SpeciesOverview = () => {
     );
   }
 
-  // 포켓몬 색상에 따른 배경색 지정
-  const getColorClass = (colorName: string): string => {
-    const colorClasses: Record<string, string> = {
-      black: "from-gray-700 to-gray-900",
-      blue: "from-blue-500 to-blue-700",
-      brown: "from-yellow-700 to-yellow-900",
-      gray: "from-gray-400 to-gray-600",
-      green: "from-green-500 to-green-700",
-      pink: "from-pink-400 to-pink-600",
-      purple: "from-purple-500 to-purple-700",
-      red: "from-red-500 to-red-700",
-      white: "from-gray-100 to-gray-300",
-      yellow: "from-yellow-400 to-yellow-600",
-    };
-
-    return colorClasses[colorName] || "from-indigo-500 to-indigo-700";
-  };
-
-  const colorGradient = getColorClass(data.color?.name || "blue");
+  const colorGradient = getColorGradient(data.color?.name || "blue");
   const flavorText =
     data.flavor_text_entries?.find((entry: { language: { name: string }; flavor_text: string }) => entry.language.name === "ko")?.flavor_text ||
     data.flavor_text_entries?.find((entry: { language: { name: string }; flavor_text: string }) => entry.language.name === "en")?.flavor_text ||

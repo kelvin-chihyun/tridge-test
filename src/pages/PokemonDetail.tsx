@@ -1,108 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { Layout } from "../shared/ui";
-
-// TypeScript 인터페이스 정의
-interface PokemonType {
-  type: {
-    name: string;
-  };
-}
-
-interface PokemonAbility {
-  ability: {
-    name: string;
-  };
-  is_hidden: boolean;
-}
-
-interface PokemonStat {
-  stat: {
-    name: string;
-  };
-  base_stat: number;
-}
-
-interface PokemonSprites {
-  front_default?: string;
-  other?: {
-    "official-artwork"?: {
-      front_default?: string;
-    };
-  };
-}
-
-interface PokemonData {
-  id: number;
-  name: string;
-  height: number;
-  weight: number;
-  base_experience: number;
-  sprites?: PokemonSprites;
-  types?: PokemonType[];
-  abilities?: PokemonAbility[];
-  stats?: PokemonStat[];
-}
-
-// 포켓몬 상세 정보를 가져오는 함수
-const fetchPokemonDetail = async (pokemonId: string) => {
-  if (!pokemonId) return null;
-  const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
-  if (!response.ok) throw new Error("Failed to fetch pokemon detail");
-  return response.json();
-};
-
-// 포켓몬 종류 정보를 가져오는 함수
-const fetchSpeciesDetail = async (speciesId: string) => {
-  if (!speciesId) return null;
-  const response = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${speciesId}`);
-  if (!response.ok) throw new Error("Failed to fetch species detail");
-  return response.json();
-};
-
-// 포켓몬 타입에 따른 그래디언트 배경색 지정
-const getTypeGradient = (type: string): string => {
-  const typeGradients: Record<string, string> = {
-    normal: "from-gray-400 to-gray-500",
-    fire: "from-red-500 to-orange-500",
-    water: "from-blue-500 to-blue-600",
-    electric: "from-yellow-400 to-yellow-500",
-    grass: "from-green-500 to-green-600",
-    ice: "from-blue-200 to-blue-300",
-    fighting: "from-red-700 to-red-800",
-    poison: "from-purple-600 to-purple-700",
-    ground: "from-yellow-600 to-yellow-700",
-    flying: "from-indigo-300 to-indigo-400",
-    psychic: "from-pink-500 to-pink-600",
-    bug: "from-green-600 to-green-700",
-    rock: "from-yellow-800 to-yellow-900",
-    ghost: "from-purple-700 to-purple-800",
-    dragon: "from-indigo-600 to-indigo-700",
-    dark: "from-gray-700 to-gray-800",
-    steel: "from-gray-400 to-gray-500",
-    fairy: "from-pink-300 to-pink-400",
-  };
-
-  return typeGradients[type] || "from-blue-500 to-indigo-600";
-};
+import { api, createQueryOptions } from "../shared/lib";
+import { PokemonData } from "../shared/types";
+import { getTypeGradient } from "../shared/util";
 
 export const PokemonDetail = () => {
   // URL 파라미터에서 species와 pokemon ID 가져오기
   const { species, pokemon } = useParams<{ species: string; pokemon: string }>();
 
   // 포켓몬 종류 데이터 가져오기 - 브레드크럼에서 사용됨
-  const { isLoading: isSpeciesLoading } = useQuery({
-    queryKey: ["species", species],
-    queryFn: () => fetchSpeciesDetail(species || ""),
-    enabled: !!species,
-  });
+  const { isLoading: isSpeciesLoading } = useQuery(createQueryOptions(["species", species], () => api.fetchSpeciesDetail(species || ""), { enabled: !!species }));
 
   // 포켓몬 상세 데이터 가져오기
-  const { data: pokemonData, isLoading: isPokemonLoading } = useQuery<PokemonData, Error>({
-    queryKey: ["pokemon", pokemon],
-    queryFn: () => fetchPokemonDetail(pokemon || ""),
-    enabled: !!pokemon,
-  });
+  const { data: pokemonData, isLoading: isPokemonLoading } = useQuery<PokemonData, Error>(
+    createQueryOptions(["pokemon", pokemon], () => api.fetchPokemonDetail(pokemon || ""), { enabled: !!pokemon })
+  );
 
   const isLoading = isSpeciesLoading || isPokemonLoading;
 

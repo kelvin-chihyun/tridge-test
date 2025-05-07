@@ -1,20 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { Layout } from "../shared/ui";
-
-// 포켓몬 종류 목록을 가져오는 함수
-const fetchSpeciesList = async () => {
-  const response = await fetch("https://pokeapi.co/api/v2/pokemon-species?limit=20");
-  if (!response.ok) throw new Error("Failed to fetch species list");
-  return response.json();
-};
+import { api, createQueryOptions } from "../shared/lib";
 
 export const SpeciesList = () => {
   // 포켓몬 종류 데이터 가져오기
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["speciesList"],
-    queryFn: fetchSpeciesList,
-  });
+  const { data, isLoading, error } = useQuery(
+    createQueryOptions(
+      ["speciesList"],
+      () => api.fetchSpeciesList(20, 0)
+    )
+  );
 
   if (isLoading) {
     return (
