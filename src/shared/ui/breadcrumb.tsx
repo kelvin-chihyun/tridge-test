@@ -1,5 +1,5 @@
-import React from "react";
 import { Link } from "react-router-dom";
+import { Fragment } from "react";
 
 /**
  * 브레드크럼 컴포넌트
@@ -56,7 +56,7 @@ export const Breadcrumb = ({ items, onItemClick, isMobile = false, isLoading = f
           const isLast = index === optimizedItems.length - 1;
 
           return (
-            <React.Fragment key={item.path || index}>
+            <Fragment key={item.path || index}>
               <li className={`${isLast ? "font-semibold" : ""}`}>
                 {item.isActive ? (
                   <span className="text-gray-700">{item.label}</span>
@@ -73,7 +73,7 @@ export const Breadcrumb = ({ items, onItemClick, isMobile = false, isLoading = f
                   <span>/</span>
                 </li>
               )}
-            </React.Fragment>
+            </Fragment>
           );
         })}
       </ol>
